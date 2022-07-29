@@ -1,0 +1,32 @@
+#Import Python Libraries
+import pandas as pd
+from sqlalchemy import create_engine
+import pymysql
+
+# create engine
+engine = create_engine('mysql+pymysql://root:Stressed6664@localhost/Data1202')
+conn = engine.connect()
+
+#assign vgsales to df
+df=pd.read_sql_query("SELECT * FROM data1202.vgsales", conn)
+df.head()
+
+#Avg sales before 2005
+before = df[df['Year'] < 2005]
+avgbefore = round((sum(before.Global_Sales)/len(before.Global_Sales)),2)
+print("The avgerage sales before 2005 was:" + str(avgbefore))
+
+#Avg sales after 2005
+after = df[df['Year'] >= 2005]
+avgafter = round(sum((after.Global_Sales)/len(after.Global_Sales)),2)
+print("The avgerage sales after 2005 was:" + str(avgafter))
+
+#Labeling Columns
+# label all columns
+label = pd.read_sql('''SELECT
+    Global_Sales AS 'Global_Sales',
+    CASE WHEN Year<= 2005 then 'pre-2005'
+    ELSE 'post-2005' end as 'Label'
+FROM
+    data1202.vgsales''', conn)
+print(label)
